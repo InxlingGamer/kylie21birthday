@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bunny Carrot Clicker</title>
+
+  <style>
+    /* Make it look decent on a phone */
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f3ff;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+
+    .stats {
+      margin-top: 8px;
+      font-size: 1.1rem;
+    }
+
+    .carrot-button {
+      margin-top: 32px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: none;
+      background: radial-gradient(circle at 30% 20%, #fffbf0, #ff9800);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      font-size: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.08s ease-out;
+    }
+
+    .carrot-button:active {
+      transform: scale(0.92);
+    }
+
+    .bunny {
+      font-size: 2.4rem;
+      margin-top: 16px;
+    }
+
+    .footer {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .floating-text {
+      position: fixed;
+      pointer-events: none;
+      font-weight: bold;
+      color: #ff5722;
+      animation: floatUp 0.6s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-40px);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>🐰 Bunny Carrot Clicker</h1>
+    <div class="stats">
+      Carrots: <span id="carrot-count">0</span>
+    </div>
+    <div class="bunny">(\_/)<br>( •_•)<br>/🥕</div>
+
+    <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">
+      🥕
+    </button>
+  </div>
+
+  <div class="footer">
+    Progress is saved automatically on this device.
+  </div>
+
+  <script>
+    // --- GAME STATE ---
+    const STORAGE_KEY = "bunnyClickerSave";
+
+    let state = {
+      carrots: 0,
+    };
+
+    // Load saved data if it exists
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed.carrots === "number") {
+            state.carrots = parsed.carrots;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load save:", e);
+      }
+    }
+
+    // Save data
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Could not save:", e);
+      }
+    }
+
+    // Update carrot text on screen
+    function updateCarrotDisplay() {
+      const carrotSpan = document.getElementById("carrot-count");
+      carrotSpan.textContent = Math.floor(state.carrots);
+    }
+
+    // Little floating +1 animation
+    function showFloatingText(text, x, y) {
+      const el = document.createElement("div");
+      el.className = "floating-text";
+      el.textContent = text;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      document.body.appendChild(el);
+
+      setTimeout(() => {
+        document.body.removeChild(el);
+      }, 600);
+    }
+
+    // Handle tap on carrot
+    function handleCarrotTap(event) {
+      // Amount gained per tap (you can change this later)
+      const gain = 1;
+
+      state.carrots += gain;
+      updateCarrotDisplay();
+      saveState();
+
+      // Get tap position for floating text
+      const x = event.touches ? event.touches[0].clientX : event.clientX;
+      const y = event.touches ? event.touches[0].clientY : event.clientY;
+      showFloatingText("+ " + gain, x, y);
+    }
+
+    // Initial setup
+    function init() {
+      loadState();
+      updateCarrotDisplay();
+
+      const carrotBtn = document.getElementById("carrot-btn");
+
+      // Click (mouse)
+      carrotBtn.addEventListener("click", handleCarrotTap);
+
+      // Touch (mobile)
+      carrotBtn.addEventListener("touchstart", function (e) {
+        e.preventDefault(); // prevent double-fire / zoom
+        handleCarrotTap(e);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
