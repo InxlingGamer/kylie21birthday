@@ -11,7 +11,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
       /* Background image */
-      background-image: url("background.png"); /* ← Change if using .jpg */
+      background-image: url("background.png"); /* change if using .jpg */
       background-size: cover;
       background-position: center bottom;
       background-repeat: no-repeat;
@@ -21,39 +21,63 @@
       flex-direction: column;
       min-height: 100vh;
       align-items: center;
-      justify-content: space-between;
       padding: 16px;
       box-sizing: border-box;
       text-align: center;
     }
 
-    h1 {
-      margin-top: 8px;
-      font-size: 1.4rem;
+    .header {
+      margin-top: 4px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
+    h1 {
+      margin: 4px 0;
+      font-size: 1.4rem;
+    }
+
     .stats {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .stats span {
+      font-weight: 700;
+    }
+
+    .main-container {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       margin-top: 8px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
     }
 
     .bunny {
       font-size: 2rem;
-      margin-top: 16px;
+      margin-top: 12px;
       white-space: pre-line;
       font-weight: bold;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .carrot-wrapper {
-      margin-top: 32px;
+      margin-top: 28px;
       width: 100%;
       display: flex;
-      justify-content: center; 
-      align-items: center;     
+      justify-content: center;
+      align-items: center;
     }
 
     .carrot-button {
@@ -76,10 +100,91 @@
       transform: scale(0.92);
     }
 
+    .section-title {
+      margin-top: 12px;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .shop-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin: 8px auto;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+      text-align: left;
+    }
+
+    .shop-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .shop-line {
+      font-size: 0.9rem;
+      margin: 2px 0;
+    }
+
+    .shop-button {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px 0;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #ff9800;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .shop-button:disabled {
+      background: #bdbdbd;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .nav {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .nav-button {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-button.active {
+      background: #ff9800;
+      color: white;
+    }
+
     .footer {
       font-size: 0.8rem;
-      opacity: 0.8;
-      margin-bottom: 10px;
+      opacity: 0.85;
+      margin-top: 6px;
+      margin-bottom: 6px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
@@ -90,6 +195,7 @@
       color: #ff5722;
       font-size: 1.2rem;
       animation: floatUp 0.6s ease-out forwards;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     @keyframes floatUp {
@@ -106,21 +212,54 @@
 </head>
 
 <body>
-  <div>
+  <header class="header">
     <h1>🐰 Bunny Carrot Clicker</h1>
-
     <div class="stats">
-      Carrots: <span id="carrot-count">0</span>
+      Carrots: <span id="carrot-count">0</span> ·
+      CPS: <span id="cps-display">0.0</span>
     </div>
+  </header>
 
-    <div class="bunny">(\_/)
+  <main class="main-container">
+    <!-- Clicker Screen -->
+    <section id="screen-clicker" class="screen active">
+      <div class="bunny">(\_/)
 ( •_•)
  /🥕</div>
 
-    <div class="carrot-wrapper">
-      <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">🥕</button>
-    </div>
-  </div>
+      <div class="carrot-wrapper">
+        <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">🥕</button>
+      </div>
+    </section>
+
+    <!-- Bunnies Shop Screen -->
+    <section id="screen-bunnies" class="screen">
+      <h2 class="section-title">Bunnies</h2>
+
+      <div class="shop-card">
+        <div class="shop-title">🐰 Baby Bunny</div>
+        <div class="shop-line">
+          Cost: <span id="baby-cost">25</span> carrots
+        </div>
+        <div class="shop-line">
+          Generates: 0.2 carrots/sec
+        </div>
+        <div class="shop-line">
+          Owned: <span id="baby-owned">0</span>
+        </div>
+        <button id="buy-baby" class="shop-button">Buy Baby Bunny</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="nav-button active" data-screen="clicker">
+      🥕 <span>Click</span>
+    </button>
+    <button class="nav-button" data-screen="bunnies">
+      🐇 <span>Bunnies</span>
+    </button>
+  </nav>
 
   <div class="footer">
     Progress is saved automatically on this device.
@@ -129,22 +268,38 @@
   <script>
     const STORAGE_KEY = "bunnyClickerSave";
 
+    const BABY_BUNNY_BASE_COST = 25;
+    const BABY_BUNNY_COST_FACTOR = 1.15;
+    const BABY_BUNNY_CPS = 0.2;
+
     let state = {
       carrots: 0,
+      babyBunnies: 0,
+      cps: 0
     };
+
+    function recalcCPS() {
+      state.cps = state.babyBunnies * BABY_BUNNY_CPS;
+    }
+
+    function getBabyCost() {
+      return Math.floor(
+        BABY_BUNNY_BASE_COST * Math.pow(BABY_BUNNY_COST_FACTOR, state.babyBunnies)
+      );
+    }
 
     function loadState() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (typeof parsed.carrots === "number") {
-            state.carrots = parsed.carrots;
-          }
+          if (typeof parsed.carrots === "number") state.carrots = parsed.carrots;
+          if (typeof parsed.babyBunnies === "number") state.babyBunnies = parsed.babyBunnies;
         }
       } catch (e) {
         console.warn("Could not load save:", e);
       }
+      recalcCPS();
     }
 
     function saveState() {
@@ -157,6 +312,27 @@
 
     function updateCarrotDisplay() {
       document.getElementById("carrot-count").textContent = Math.floor(state.carrots);
+    }
+
+    function updateCPSDisplay() {
+      document.getElementById("cps-display").textContent = state.cps.toFixed(1);
+    }
+
+    function updateBunnyShop() {
+      const cost = getBabyCost();
+      const costEl = document.getElementById("baby-cost");
+      const ownedEl = document.getElementById("baby-owned");
+      const buyBtn = document.getElementById("buy-baby");
+
+      costEl.textContent = cost;
+      ownedEl.textContent = state.babyBunnies;
+      buyBtn.disabled = state.carrots < cost;
+    }
+
+    function updateAllUI() {
+      updateCarrotDisplay();
+      updateCPSDisplay();
+      updateBunnyShop();
     }
 
     function showFloatingText(text, x, y) {
@@ -174,9 +350,9 @@
 
     function handleCarrotTap(event) {
       const gain = 1;
-
       state.carrots += gain;
       updateCarrotDisplay();
+      updateBunnyShop();
       saveState();
 
       const x = event.touches ? event.touches[0].clientX : event.clientX;
@@ -184,22 +360,64 @@
       showFloatingText("+ " + gain, x, y);
     }
 
+    function buyBabyBunny() {
+      const cost = getBabyCost();
+      if (state.carrots < cost) return;
+      state.carrots -= cost;
+      state.babyBunnies += 1;
+      recalcCPS();
+      updateAllUI();
+      saveState();
+    }
+
+    function startLoop() {
+      setInterval(() => {
+        if (state.cps > 0) {
+          state.carrots += state.cps / 10; // every 100ms
+          updateCarrotDisplay();
+          updateBunnyShop();
+        }
+      }, 100);
+    }
+
+    function setupNav() {
+      const screens = document.querySelectorAll(".screen");
+      const buttons = document.querySelectorAll(".nav-button");
+
+      function showScreen(name) {
+        screens.forEach(s => {
+          s.classList.toggle("active", s.id === "screen-" + name);
+        });
+        buttons.forEach(b => {
+          b.classList.toggle("active", b.dataset.screen === name);
+        });
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          showScreen(btn.dataset.screen);
+        });
+      });
+    }
+
     function init() {
       loadState();
-      updateCarrotDisplay();
+      updateAllUI();
 
       const carrotBtn = document.getElementById("carrot-btn");
-
       carrotBtn.addEventListener("click", handleCarrotTap);
-
       carrotBtn.addEventListener("touchstart", function (e) {
         e.preventDefault();
         handleCarrotTap(e);
       });
+
+      document.getElementById("buy-baby").addEventListener("click", buyBabyBunny);
+
+      setupNav();
+      startLoop();
     }
 
     document.addEventListener("DOMContentLoaded", init);
   </script>
-
 </body>
 </html>
