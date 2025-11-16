@@ -10,7 +10,12 @@
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f3ff;
+      /* background image */
+      background-image: url("background.png"); 
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+
       color: #222;
       display: flex;
       flex-direction: column;
@@ -21,6 +26,7 @@
       box-sizing: border-box;
       text-align: center;
     }
+
 
     h1 {
       margin-top: 8px;
@@ -92,14 +98,25 @@
     </div>
     <div class="bunny">(\_/)<br>( •_•)<br>/🥕</div>
 
-    <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">
-      🥕
-    </button>
+        <div class="carrot-wrapper">
+      <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">
+        🥕
+      </button>
+    </div>
   </div>
 
   <div class="footer">
     Progress is saved automatically on this device.
   </div>
+
+    .carrot-wrapper {
+    margin-top: 32px;
+    width: 100%;
+    display: flex;
+    justify-content: center;  /* centers horizontally */
+    align-items: center;      /* centers within the row */
+  }
+
 
   <script>
     // --- GAME STATE ---
