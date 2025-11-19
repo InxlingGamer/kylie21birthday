@@ -1,454 +1,761 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Disable zooming on iPhone (stops double-tap + pinch zoom) -->
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  />
-  <title>Bunny Carrot Clicker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Bunny Clicker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    html, body {
-      height: 100%;
-    }
+    <style>
+        /* Core Mobile Settings */
+        :root {
+            --primary-orange: #ff8c42;
+            --primary-green: #8bc34a;
+            --night-bg: #1a1a2e;
+            --day-bg: #fdfbf7;
+        }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--day-bg);
+            color: #333;
+            overflow: hidden; /* Prevent scroll */
+            touch-action: manipulation; /* Improve touch response */
+            -webkit-user-select: none; /* Prevent text selection */
+            user-select: none;
+            transition: background-color 1s ease;
+        }
 
-      /* Background image */
-      background-image: url("background.png"); /* change if using .jpg */
-      background-size: cover;
-      background-position: center bottom;
-      background-repeat: no-repeat;
+        /* Night Mode Transition */
+        body.night-mode {
+            background-color: var(--night-bg);
+            color: #e0e0e0;
+        }
+        body.night-mode .panel-bg {
+            background-color: #16213e;
+            border-color: #30475e;
+        }
 
-      color: #222;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;        /* lock to viewport height */
-      overflow: hidden;     /* no scrolling */
-      align-items: center;
-      padding: 8px 12px;    /* slightly smaller padding so it all fits */
-      box-sizing: border-box;
-      text-align: center;
-      -webkit-user-select: none;
-      user-select: none;
-      overscroll-behavior-y: none;
-      -webkit-overflow-scrolling: auto;
-    }
+        /* The Giant Carrot */
+        #giant-carrot {
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #giant-carrot:active {
+            transform: scale(0.9);
+        }
+        .carrot-squish {
+            animation: squish 0.15s;
+        }
+        @keyframes squish {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1, 0.9); }
+            100% { transform: scale(1); }
+        }
 
-    button {
-      touch-action: manipulation; /* helps reduce double-tap behavior */
-    }
+        /* Floating Particles (+1) */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 50;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        }
 
-    .header {
-      margin-top: 0;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
+        /* Golden Bunny */
+        #golden-bunny {
+            position: absolute;
+            font-size: 3rem;
+            z-index: 40;
+            display: none;
+            transition: left 4s linear; /* Movement logic handled in JS usually, but CSS helps smoothness */
+        }
 
-    h1 {
-      margin: 2px 0;
-      font-size: 1.3rem;
-    }
+        /* Tab Panels */
+        .tab-content {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 100px; /* Space for nav */
+        }
+        .tab-content.active {
+            display: block;
+        }
 
-    .stats {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
+        /* Custom Scrollbar hide */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-    .stats span {
-      font-weight: 700;
-    }
+        /* Button Press Effect */
+        .btn-press:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
 
-    .main-container {
-      flex: 1;
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      margin-top: 4px;
-      overflow: hidden; /* keep inner content from creating scroll */
-    }
-
-    .screen {
-      width: 100%;
-      max-width: 480px;
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    .bunny {
-      font-size: 1.8rem;
-      margin-top: 6px;
-      white-space: pre-line;
-      font-weight: bold;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .carrot-wrapper {
-      margin-top: 16px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* slightly smaller so everything fits on shorter viewports */
-    .carrot-button {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      border: none;
-      background: radial-gradient(circle at 30% 20%, #fffbf0, #ff9800);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
-      font-size: 2.6rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.08s ease-out;
-    }
-
-    .carrot-button:active {
-      transform: scale(0.92);
-    }
-
-    .section-title {
-      margin-top: 6px;
-      margin-bottom: 4px;
-      font-size: 1.1rem;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .shop-card {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin: 6px auto;
-      width: 92%;
-      max-width: 380px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-      text-align: left;
-      box-sizing: border-box;
-    }
-
-    .shop-title {
-      font-weight: 700;
-      margin-bottom: 2px;
-      font-size: 0.95rem;
-    }
-
-    .shop-line {
-      font-size: 0.85rem;
-      margin: 1px 0;
-    }
-
-    .shop-button {
-      margin-top: 6px;
-      width: 100%;
-      padding: 6px 0;
-      border-radius: 999px;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: #ff9800;
-      color: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .shop-button:disabled {
-      background: #bdbdbd;
-      box-shadow: none;
-      cursor: default;
-    }
-
-    .nav {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .nav-button {
-      flex: 1;
-      padding: 6px 0;
-      border-radius: 999px;
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-      -webkit-tap-highlight-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .nav-button.active {
-      background: #ff9800;
-      color: white;
-    }
-
-    .footer {
-      font-size: 0.75rem;
-      opacity: 0.9;
-      margin-top: 2px;
-      margin-bottom: 2px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .floating-text {
-      position: fixed;
-      pointer-events: none;
-      font-weight: bold;
-      color: #ff5722;
-      font-size: 1.1rem;
-      animation: floatUp 0.6s ease-out forwards;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    @keyframes floatUp {
-      from {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-40px);
-        opacity: 0;
-      }
-    }
-  </style>
+        /* Carrot Storm Overlay */
+        .storm-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, transparent 50%, rgba(255, 165, 0, 0.3) 100%);
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
+    </style>
 </head>
+<body class="h-[100dvh] w-screen flex flex-col relative">
 
-<body>
-  <header class="header">
-    <h1>🐰 Bunny Carrot Clicker</h1>
-    <div class="stats">
-      Carrots: <span id="carrot-count">0</span> ·
-      CPS: <span id="cps-display">0.0</span>
+    <!-- Storm Effect -->
+    <div id="storm-overlay" class="storm-overlay"></div>
+
+    <!-- Golden Bunny -->
+    <div id="golden-bunny">🐇</div>
+
+    <!-- TOP: HUD -->
+    <header class="flex-none p-4 pt-8 pb-2 bg-orange-100 dark:bg-slate-800 border-b border-orange-200 shadow-sm z-20 panel-bg transition-colors duration-500">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Carrots</div>
+                <div id="carrot-display" class="text-3xl font-black text-orange-600 font-mono">0</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Per Second</div>
+                <div id="cps-display" class="text-xl font-bold text-green-600 font-mono">0.0</div>
+            </div>
+        </div>
+        <!-- Prestige Bar (Hidden initially) -->
+        <div id="prestige-status" class="hidden mt-2 text-xs text-purple-600 font-bold text-center">
+            Bunny Spirit Active: <span id="spirit-bonus">0%</span> Boost
+        </div>
+    </header>
+
+    <!-- MIDDLE: The Game Area (Tap Zone) -->
+    <main id="click-zone" class="flex-grow flex flex-col items-center justify-center relative overflow-hidden">
+        
+        <!-- Weather/Event Indicator -->
+        <div id="event-banner" class="absolute top-4 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold shadow-lg transform -translate-y-20 transition-transform duration-300 z-10">
+            EVENT ACTIVE!
+        </div>
+
+        <!-- The Giant Carrot -->
+        <div id="giant-carrot" class="text-[180px] leading-none select-none relative z-10">
+            🥕
+        </div>
+        
+        <div class="mt-8 text-gray-400 text-sm font-medium animate-pulse">Tap to harvest</div>
+
+        <!-- Particle Container -->
+        <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+    </main>
+
+    <!-- BOTTOM: Controls & Shop -->
+    <div class="flex-none bg-white dark:bg-slate-900 h-[45dvh] rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] flex flex-col z-30 panel-bg transition-colors duration-500">
+        
+        <!-- Tabs Navigation -->
+        <div class="flex border-b border-gray-100 dark:border-gray-700">
+            <button onclick="switchTab('bunnies')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 active-tab text-orange-500 border-b-2 border-orange-500 transition-colors" id="tab-btn-bunnies">
+                <i class="fas fa-paw mb-1 block"></i> Bunnies
+            </button>
+            <button onclick="switchTab('burrows')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 transition-colors" id="tab-btn-burrows">
+                <i class="fas fa-dungeon mb-1 block"></i> Burrows
+            </button>
+            <button onclick="switchTab('upgrades')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 transition-colors" id="tab-btn-upgrades">
+                <i class="fas fa-bolt mb-1 block"></i> Upgrades
+            </button>
+            <button onclick="switchTab('settings')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 transition-colors" id="tab-btn-settings">
+                <i class="fas fa-cog mb-1 block"></i> System
+            </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="flex-grow relative overflow-hidden bg-gray-50 dark:bg-slate-800 transition-colors duration-500">
+            
+            <!-- BUNNIES TAB -->
+            <div id="tab-bunnies" class="tab-content active p-4 space-y-3">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- BURROWS TAB -->
+            <div id="tab-burrows" class="tab-content p-4 space-y-3">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- UPGRADES TAB -->
+            <div id="tab-upgrades" class="tab-content p-4 space-y-3">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- SETTINGS/PRESTIGE TAB -->
+            <div id="tab-settings" class="tab-content p-4 space-y-4">
+                
+                <div class="bg-purple-100 dark:bg-purple-900 p-6 rounded-xl text-center shadow-sm border border-purple-200 dark:border-purple-700">
+                    <h3 class="text-lg font-bold text-purple-800 dark:text-purple-200 mb-2">Bunny Ascension</h3>
+                    <p class="text-sm text-purple-600 dark:text-purple-300 mb-4">Reset progress to gain Bunny Spirit Points (BSP). Current BSP: <span id="current-bsp">0</span></p>
+                    <p class="text-xs text-gray-500 mb-4">Resetting now gives: <span id="pending-bsp" class="font-bold text-purple-600">0</span> BSP</p>
+                    <button onclick="game.prestige()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-bold shadow-md btn-press">Ascend (Reset)</button>
+                </div>
+
+                <div class="space-y-2">
+                    <button onclick="game.save()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold shadow-sm btn-press">Force Save</button>
+                    <button onclick="game.hardReset()" class="w-full bg-red-500 text-white py-3 rounded-lg font-bold shadow-sm btn-press">Wipe Save Data</button>
+                </div>
+                
+                <div class="text-center text-xs text-gray-400 mt-4">
+                    Bunny Clicker Mobile v1.0
+                </div>
+            </div>
+
+        </div>
     </div>
-  </header>
 
-  <main class="main-container">
-    <!-- Clicker Screen -->
-    <section id="screen-clicker" class="screen active">
-      <div class="bunny">(\_/)
-( •_•)
- /🥕</div>
+    <script>
+        /**
+         * GAME CONFIGURATION & DATA
+         */
+        const CONFIG = {
+            bunnies: [
+                { id: 'baby', name: 'Baby Bunny', cost: 25, production: 0.2, icon: 'fa-baby', desc: 'Small and cute.' },
+                { id: 'grower', name: 'Grower Bunny', cost: 150, production: 1, icon: 'fa-carrot', desc: 'Knows good veggies.' },
+                { id: 'farmer', name: 'Farmer Bunny', cost: 500, production: 3, icon: 'fa-hat-cowboy', desc: 'Uses a tiny hoe.' },
+                { id: 'turbo', name: 'Turbo Bunny', cost: 2000, production: 12, icon: 'fa-running', desc: 'Moves incredibly fast.' },
+                { id: 'robot', name: 'Mecha Bunny', cost: 25000, production: 80, icon: 'fa-robot', desc: 'Efficient harvesting.' }
+            ],
+            burrows: [
+                { id: 'hole', name: 'Small Burrow', cost: 1000, production: 5, icon: 'fa-campground', desc: 'Cozy underground home.' },
+                { id: 'tunnel', name: 'Deep Tunnel', cost: 7500, production: 25, icon: 'fa-dungeon', desc: 'Miles of storage.' },
+                { id: 'farm', name: 'Carrot Farm', cost: 40000, production: 140, icon: 'fa-warehouse', desc: 'Industrial scale.' },
+                { id: 'greenhouse', name: 'Greenhouse', cost: 200000, production: 750, icon: 'fa-leaf', desc: 'Year-round growth.' }
+            ],
+            upgrades: [
+                { id: 'u_tap1', name: 'Sharper Incisors', cost: 250, type: 'tap', val: 1, icon: 'fa-teeth', desc: '+1 Carrot per tap' },
+                { id: 'u_tap2', name: 'Energized Paws', cost: 1000, type: 'tap', val: 3, icon: 'fa-hand-sparkles', desc: '+3 Carrots per tap' },
+                { id: 'u_all1', name: 'Bunny Union', cost: 5000, type: 'global', val: 1.1, icon: 'fa-users', desc: 'Production +10%' },
+                { id: 'u_click_crit', name: 'Mega Crunch', cost: 15000, type: 'crit', val: 0.05, icon: 'fa-star', desc: '5% Chance for x10 Tap' },
+                { id: 'u_turbo', name: 'Headbands', cost: 50000, type: 'unit', target: 'turbo', val: 1.5, icon: 'fa-ribbon', desc: 'Turbo Bunnies +50%' }
+            ]
+        };
 
-      <div class="carrot-wrapper">
-        <button id="carrot-btn" class="carrot-button" aria-label="Tap the carrot">🥕</button>
-      </div>
-    </section>
+        /**
+         * GAME ENGINE
+         */
+        const game = {
+            state: {
+                carrots: 0,
+                totalCarrots: 0, // Lifetime for prestige
+                prestigePoints: 0,
+                clickCount: 0,
+                startTime: Date.now(),
+                items: {}, // key: id, value: count
+                upgrades: [], // list of purchased upgrade IDs
+            },
+            
+            modifiers: {
+                globalProdMult: 1,
+                tapValue: 1,
+                critChance: 0,
+                eventMult: 1
+            },
 
-    <!-- Bunnies Shop Screen -->
-    <section id="screen-bunnies" class="screen">
-      <h2 class="section-title">Bunnies</h2>
+            settings: {
+                nightMode: false
+            },
 
-      <div class="shop-card">
-        <div class="shop-title">🐰 Baby Bunny</div>
-        <div class="shop-line">
-          Cost: <span id="baby-cost">25</span> carrots
-        </div>
-        <div class="shop-line">
-          Generates: 0.2 carrots/sec
-        </div>
-        <div class="shop-line">
-          Owned: <span id="baby-owned">0</span>
-        </div>
-        <button id="buy-baby" class="shop-button">Buy Baby Bunny</button>
-      </div>
-    </section>
-  </main>
+            timers: {
+                lastTick: Date.now(),
+                goldenBunny: null,
+                nightMode: null,
+                storm: null
+            },
 
-  <nav class="nav">
-    <button class="nav-button active" data-screen="clicker">
-      🥕 <span>Click</span>
-    </button>
-    <button class="nav-button" data-screen="bunnies">
-      🐇 <span>Bunnies</span>
-    </button>
-  </nav>
+            // Initialization
+            init() {
+                this.load();
+                this.initUI();
+                this.gameLoop();
+                this.setupEvents();
+                
+                // Auto-save
+                setInterval(() => this.save(), 10000);
+            },
 
-  <div class="footer">
-    Progress is saved automatically on this device.
-  </div>
+            // UI Setup
+            initUI() {
+                // Render Bunnies
+                const bunnyContainer = document.getElementById('tab-bunnies');
+                CONFIG.bunnies.forEach(item => {
+                    bunnyContainer.innerHTML += this.createItemCard(item, 'bunny');
+                    if(!this.state.items[item.id]) this.state.items[item.id] = 0;
+                });
 
-  <script>
-    const STORAGE_KEY = "bunnyClickerSave";
+                // Render Burrows
+                const burrowContainer = document.getElementById('tab-burrows');
+                CONFIG.burrows.forEach(item => {
+                    burrowContainer.innerHTML += this.createItemCard(item, 'burrow');
+                    if(!this.state.items[item.id]) this.state.items[item.id] = 0;
+                });
 
-    const BABY_BUNNY_BASE_COST = 25;
-    const BABY_BUNNY_COST_FACTOR = 1.15;
-    const BABY_BUNNY_CPS = 0.2;
+                // Render Upgrades
+                this.renderUpgrades();
 
-    let state = {
-      carrots: 0,
-      babyBunnies: 0,
-      cps: 0
-    };
+                // Listeners
+                document.getElementById('giant-carrot').addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent zoom
+                    // Handle multi-touch
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        this.handleTap(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                    }
+                }, { passive: false });
 
-    function recalcCPS() {
-      state.cps = state.babyBunnies * BABY_BUNNY_CPS;
-    }
+                document.getElementById('giant-carrot').addEventListener('click', (e) => {
+                    // Fallback for desktop testing
+                    this.handleTap(e.clientX, e.clientY);
+                });
 
-    function getBabyCost() {
-      return Math.floor(
-        BABY_BUNNY_BASE_COST * Math.pow(BABY_BUNNY_COST_FACTOR, state.babyBunnies)
-      );
-    }
+                document.getElementById('golden-bunny').addEventListener('touchstart', (e) => {
+                    e.preventDefault(); 
+                    this.clickGoldenBunny();
+                });
+                document.getElementById('golden-bunny').addEventListener('click', () => this.clickGoldenBunny());
+            },
 
-    function loadState() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (typeof parsed.carrots === "number") state.carrots = parsed.carrots;
-          if (typeof parsed.babyBunnies === "number") state.babyBunnies = parsed.babyBunnies;
+            renderUpgrades() {
+                const container = document.getElementById('tab-upgrades');
+                container.innerHTML = '';
+                CONFIG.upgrades.forEach(upg => {
+                    if (this.state.upgrades.includes(upg.id)) return; // Already bought
+                    container.innerHTML += `
+                        <div class="bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-gray-600" id="card-${upg.id}">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
+                                    <i class="fas ${upg.icon}"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm dark:text-white">${upg.name}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">${upg.desc}</div>
+                                </div>
+                            </div>
+                            <button onclick="game.buyUpgrade('${upg.id}')" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm btn-press min-w-[80px]">
+                                ${this.formatNumber(upg.cost)} 🥕
+                            </button>
+                        </div>
+                    `;
+                });
+                if (container.innerHTML === '') {
+                    container.innerHTML = '<div class="text-center text-gray-400 mt-10">All upgrades purchased!</div>';
+                }
+            },
+
+            createItemCard(item, type) {
+                return `
+                    <div class="bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-gray-600 item-card" data-id="${item.id}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-orange-100 dark:bg-slate-600 text-orange-500 flex items-center justify-center text-xl relative">
+                                <i class="fas ${item.icon}"></i>
+                                <div class="absolute -top-2 -right-2 bg-gray-800 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold count-badge" id="count-${item.id}">0</div>
+                            </div>
+                            <div>
+                                <div class="font-bold text-sm dark:text-white">${item.name}</div>
+                                <div class="text-xs text-green-600 font-mono">+${item.production} CPS</div>
+                            </div>
+                        </div>
+                        <button onclick="game.buyItem('${item.id}', '${type}')" class="bg-orange-500 disabled:bg-gray-300 dark:disabled:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm btn-press min-w-[90px] transition-colors" id="btn-${item.id}">
+                            ${this.formatNumber(item.cost)}
+                        </button>
+                    </div>
+                `;
+            },
+
+            // Core Mechanics
+            handleTap(x, y) {
+                // Calculate value
+                let val = (1 + (this.state.prestigePoints * 0.1)); // Base + Prestige
+                
+                // Add Tap Upgrades
+                CONFIG.upgrades.forEach(u => {
+                    if (this.state.upgrades.includes(u.id) && u.type === 'tap') val += u.val;
+                });
+
+                // Apply Event Multiplier
+                val *= this.modifiers.eventMult;
+
+                // Crit check
+                let isCrit = false;
+                let critChance = this.modifiers.critChance;
+                if (Math.random() < critChance) {
+                    val *= 10;
+                    isCrit = true;
+                }
+
+                this.addCarrots(val);
+                this.state.clickCount++;
+
+                // Visuals
+                this.spawnParticle(x, y, `+${this.formatNumber(val)}`, isCrit);
+                this.animateCarrot();
+                
+                // Haptics
+                if (navigator.vibrate) navigator.vibrate(isCrit ? 50 : 5);
+            },
+
+            calculateCPS() {
+                let cps = 0;
+                
+                // Bunnies
+                CONFIG.bunnies.forEach(b => {
+                    let count = this.state.items[b.id] || 0;
+                    let prod = b.production;
+                    
+                    // Specific Upgrade logic
+                    if (b.id === 'turbo' && this.state.upgrades.includes('u_turbo')) {
+                        prod *= 1.5;
+                    }
+                    
+                    cps += count * prod;
+                });
+
+                // Burrows
+                CONFIG.burrows.forEach(b => {
+                    let count = this.state.items[b.id] || 0;
+                    cps += count * b.production;
+                });
+
+                // Global Multipliers
+                let globalMult = 1 + (this.state.prestigePoints * 0.1); // +10% per prestige point
+                if (this.state.upgrades.includes('u_all1')) globalMult *= 1.1;
+                
+                // Events
+                globalMult *= this.modifiers.eventMult;
+
+                return cps * globalMult;
+            },
+
+            addCarrots(amount) {
+                this.state.carrots += amount;
+                this.state.totalCarrots += amount;
+                this.updateHeader();
+                this.updateButtons();
+            },
+
+            // Purchasing Logic
+            buyItem(id, type) {
+                const list = type === 'bunny' ? CONFIG.bunnies : CONFIG.burrows;
+                const item = list.find(i => i.id === id);
+                const currentCount = this.state.items[id];
+                
+                // Cost Formula: Base * 1.15^count
+                const cost = Math.floor(item.cost * Math.pow(1.15, currentCount));
+
+                if (this.state.carrots >= cost) {
+                    this.state.carrots -= cost;
+                    this.state.items[id]++;
+                    
+                    // Update UI
+                    this.updateHeader();
+                    this.updateButtons();
+                    
+                    if(navigator.vibrate) navigator.vibrate(10);
+                }
+            },
+
+            buyUpgrade(id) {
+                const upg = CONFIG.upgrades.find(u => u.id === id);
+                if (this.state.carrots >= upg.cost) {
+                    this.state.carrots -= upg.cost;
+                    this.state.upgrades.push(id);
+                    
+                    // Apply instant effects
+                    if (upg.type === 'crit') this.modifiers.critChance += upg.val;
+
+                    this.renderUpgrades();
+                    this.updateHeader();
+                }
+            },
+
+            // Visual & Audio
+            spawnParticle(x, y, text, isCrit) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = text;
+                p.style.left = `${x}px`;
+                p.style.top = `${y - 50}px`; // Offset slightly up
+                p.style.color = isCrit ? '#ffd700' : '#ff8c42';
+                if (isCrit) {
+                    p.style.fontSize = '2.5rem';
+                    p.style.textShadow = '0 0 10px orange';
+                }
+                
+                document.getElementById('particle-container').appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            },
+
+            animateCarrot() {
+                const carrot = document.getElementById('giant-carrot');
+                carrot.classList.remove('carrot-squish');
+                void carrot.offsetWidth; // trigger reflow
+                carrot.classList.add('carrot-squish');
+            },
+
+            // Game Loop
+            gameLoop() {
+                const now = Date.now();
+                const dt = (now - this.timers.lastTick) / 1000;
+                this.timers.lastTick = now;
+
+                if (dt > 0) {
+                    const cps = this.calculateCPS();
+                    this.addCarrots(cps * dt);
+                }
+
+                requestAnimationFrame(() => this.gameLoop());
+            },
+
+            // Event System
+            setupEvents() {
+                // Golden Bunny: Every 60-120 seconds
+                setInterval(() => {
+                    if (Math.random() > 0.5) this.spawnGoldenBunny();
+                }, 45000);
+
+                // Night Mode: Every 3 minutes
+                setInterval(() => {
+                    this.toggleNightMode();
+                }, 180000);
+                
+                // Carrot Storm: Random chance
+                setInterval(() => {
+                    if (Math.random() > 0.8) this.triggerStorm();
+                }, 120000);
+            },
+
+            spawnGoldenBunny() {
+                const bunny = document.getElementById('golden-bunny');
+                bunny.style.display = 'block';
+                bunny.style.top = `${Math.random() * 40 + 10}%`; // Random height
+                
+                // Animate
+                let pos = -10;
+                const interval = setInterval(() => {
+                    pos += 0.5;
+                    bunny.style.left = `${pos}%`;
+                    if (pos > 110) {
+                        clearInterval(interval);
+                        bunny.style.display = 'none';
+                    }
+                }, 16);
+                
+                // Store interval to clear if clicked
+                bunny.dataset.intervalId = interval;
+            },
+
+            clickGoldenBunny() {
+                const bunny = document.getElementById('golden-bunny');
+                clearInterval(bunny.dataset.intervalId);
+                bunny.style.display = 'none';
+                
+                // Reward: 5 minutes of CPS or big flat amount
+                const reward = Math.max(100, this.calculateCPS() * 300);
+                this.addCarrots(reward);
+                
+                this.spawnMessage("GOLDEN BUNNY! +" + this.formatNumber(reward));
+                if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            },
+
+            triggerStorm() {
+                this.modifiers.eventMult = 3;
+                document.getElementById('storm-overlay').style.display = 'block';
+                this.showBanner("CARROT STORM (x3)!");
+                
+                setTimeout(() => {
+                    this.modifiers.eventMult = 1;
+                    document.getElementById('storm-overlay').style.display = 'none';
+                    this.hideBanner();
+                }, 15000); // 15 seconds
+            },
+
+            toggleNightMode() {
+                this.settings.nightMode = !this.settings.nightMode;
+                if (this.settings.nightMode) {
+                    document.body.classList.add('night-mode');
+                    this.spawnMessage("Night falls... (Moon Carrots Active)");
+                } else {
+                    document.body.classList.remove('night-mode');
+                }
+            },
+
+            // Prestige System
+            prestige() {
+                const pending = Math.floor(Math.sqrt(this.state.totalCarrots / 1000000));
+                if (pending === 0 && this.state.prestigePoints === 0 && this.state.totalCarrots < 1000000) {
+                    alert("Not enough total harvested carrots to ascend! (Need 1M+)");
+                    return;
+                }
+
+                if (confirm(`Ascend? You will lose resources/buildings but gain ${pending} Spirit Points.`)) {
+                    this.state.prestigePoints += pending;
+                    // Reset Logic
+                    this.state.carrots = 0;
+                    this.state.totalCarrots = 0;
+                    this.state.items = {};
+                    this.state.upgrades = [];
+                    CONFIG.bunnies.forEach(b => this.state.items[b.id] = 0);
+                    CONFIG.burrows.forEach(b => this.state.items[b.id] = 0);
+                    
+                    this.save();
+                    location.reload();
+                }
+            },
+
+            hardReset() {
+                if(confirm("Are you sure? This deletes EVERYTHING.")) {
+                    localStorage.removeItem('bunnyClickerSave');
+                    location.reload();
+                }
+            },
+
+            // Utilities
+            updateHeader() {
+                document.getElementById('carrot-display').innerText = this.formatNumber(Math.floor(this.state.carrots));
+                document.getElementById('cps-display').innerText = this.formatNumber(this.calculateCPS().toFixed(1));
+                
+                // Calculate Pending Prestige
+                const pending = Math.floor(Math.sqrt(this.state.totalCarrots / 1000000));
+                document.getElementById('pending-bsp').innerText = pending;
+                document.getElementById('current-bsp').innerText = this.state.prestigePoints;
+
+                if (this.state.prestigePoints > 0) {
+                    document.getElementById('prestige-status').classList.remove('hidden');
+                    document.getElementById('spirit-bonus').innerText = (this.state.prestigePoints * 10) + "%";
+                }
+            },
+
+            updateButtons() {
+                // Update Bunnies
+                CONFIG.bunnies.forEach(item => {
+                    const currentCount = this.state.items[item.id];
+                    const cost = Math.floor(item.cost * Math.pow(1.15, currentCount));
+                    
+                    document.getElementById(`count-${item.id}`).innerText = currentCount;
+                    const btn = document.getElementById(`btn-${item.id}`);
+                    btn.innerText = this.formatNumber(cost);
+                    
+                    if (this.state.carrots >= cost) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50');
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50');
+                    }
+                });
+
+                // Update Burrows
+                CONFIG.burrows.forEach(item => {
+                    const currentCount = this.state.items[item.id];
+                    const cost = Math.floor(item.cost * Math.pow(1.15, currentCount));
+                    
+                    document.getElementById(`count-${item.id}`).innerText = currentCount;
+                    const btn = document.getElementById(`btn-${item.id}`);
+                    btn.innerText = this.formatNumber(cost);
+                    
+                    if (this.state.carrots >= cost) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50');
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50');
+                    }
+                });
+                
+                // Update Upgrade buttons visibility logic handled in renderUpgrades mostly, 
+                // but we can add grayscale logic here if we wanted strictly realtime updates.
+            },
+
+            spawnMessage(msg) {
+                const banner = document.getElementById('event-banner');
+                banner.innerText = msg;
+                banner.style.transform = 'translateY(0)';
+                setTimeout(() => banner.style.transform = 'translateY(-100px)', 3000);
+            },
+
+            showBanner(msg) {
+                const banner = document.getElementById('event-banner');
+                banner.innerText = msg;
+                banner.style.transform = 'translateY(0)';
+            },
+
+            hideBanner() {
+                document.getElementById('event-banner').style.transform = 'translateY(-100px)';
+            },
+
+            formatNumber(num) {
+                if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            },
+
+            save() {
+                localStorage.setItem('bunnyClickerSave', JSON.stringify(this.state));
+            },
+
+            load() {
+                const saved = localStorage.getItem('bunnyClickerSave');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Merge to ensure new fields exist if updated
+                    this.state = { ...this.state, ...parsed };
+                    
+                    // Re-init empty items if new ones added to CONFIG
+                    CONFIG.bunnies.forEach(b => { if(this.state.items[b.id] === undefined) this.state.items[b.id] = 0; });
+                    CONFIG.burrows.forEach(b => { if(this.state.items[b.id] === undefined) this.state.items[b.id] = 0; });
+                }
+            }
+        };
+
+        // Tab Switch Logic
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('button[id^="tab-btn-"]').forEach(el => {
+                el.classList.remove('text-orange-500', 'border-b-2', 'border-orange-500');
+                el.classList.add('text-gray-400');
+            });
+
+            // Show target
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const btn = document.getElementById(`tab-btn-${tabId}`);
+            btn.classList.remove('text-gray-400');
+            btn.classList.add('text-orange-500', 'border-b-2', 'border-orange-500');
         }
-      } catch (e) {
-        console.warn("Could not load save:", e);
-      }
-      recalcCPS();
-    }
 
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.warn("Could not save:", e);
-      }
-    }
+        // Start Game
+        window.onload = () => game.init();
+        window.onbeforeunload = () => game.save();
 
-    function updateCarrotDisplay() {
-      document.getElementById("carrot-count").textContent = Math.floor(state.carrots);
-    }
-
-    function updateCPSDisplay() {
-      document.getElementById("cps-display").textContent = state.cps.toFixed(1);
-    }
-
-    function updateBunnyShop() {
-      const cost = getBabyCost();
-      const costEl = document.getElementById("baby-cost");
-      const ownedEl = document.getElementById("baby-owned");
-      const buyBtn = document.getElementById("buy-baby");
-
-      costEl.textContent = cost;
-      ownedEl.textContent = state.babyBunnies;
-      buyBtn.disabled = state.carrots < cost;
-    }
-
-    function updateAllUI() {
-      updateCarrotDisplay();
-      updateCPSDisplay();
-      updateBunnyShop();
-    }
-
-    function showFloatingText(text, x, y) {
-      const el = document.createElement("div");
-      el.className = "floating-text";
-      el.textContent = text;
-      el.style.left = x + "px";
-      el.style.top = y + "px";
-      document.body.appendChild(el);
-
-      setTimeout(() => {
-        document.body.removeChild(el);
-      }, 600);
-    }
-
-    function handleCarrotTap(event) {
-      const gain = 1;
-      state.carrots += gain;
-      updateCarrotDisplay();
-      updateBunnyShop();
-      saveState();
-
-      const x = event.touches ? event.touches[0].clientX : event.clientX;
-      const y = event.touches ? event.touches[0].clientY : event.clientY;
-      showFloatingText("+ " + gain, x, y);
-    }
-
-    function buyBabyBunny() {
-      const cost = getBabyCost();
-      if (state.carrots < cost) return;
-      state.carrots -= cost;
-      state.babyBunnies += 1;
-      recalcCPS();
-      updateAllUI();
-      saveState();
-    }
-
-    function startLoop() {
-      setInterval(() => {
-        if (state.cps > 0) {
-          state.carrots += state.cps / 10; // every 100ms
-          updateCarrotDisplay();
-          updateBunnyShop();
-        }
-      }, 100);
-    }
-
-    function setupNav() {
-      const screens = document.querySelectorAll(".screen");
-      const buttons = document.querySelectorAll(".nav-button");
-
-      function showScreen(name) {
-        screens.forEach(s => {
-          s.classList.toggle("active", s.id === "screen-" + name);
-        });
-        buttons.forEach(b => {
-          b.classList.toggle("active", b.dataset.screen === name);
-        });
-      }
-
-      buttons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          showScreen(btn.dataset.screen);
-        });
-      });
-    }
-
-    // Extra: prevent double-tap zoom anywhere on the page
-    let lastTouchEnd = 0;
-    document.addEventListener("touchend", function (e) {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, { passive: false });
-
-    function init() {
-      loadState();
-      updateAllUI();
-
-      const carrotBtn = document.getElementById("carrot-btn");
-      carrotBtn.addEventListener("click", handleCarrotTap);
-      carrotBtn.addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        handleCarrotTap(e);
-      }, { passive: false });
-
-      document.getElementById("buy-baby").addEventListener("click", buyBabyBunny);
-
-      setupNav();
-      startLoop();
-    }
-
-    document.addEventListener("DOMContentLoaded", init);
-  </script>
+    </script>
 </body>
 </html>
