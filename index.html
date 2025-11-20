@@ -189,7 +189,7 @@
             🥕
         </div>
         
-        <div class="mt-8 text-gray-400 text-sm font-medium animate-pulse">Tap for birthday magic</div>
+        <div class="mt-8 text-gray-400 text-sm font-medium animate-pulse">Tap for some yummy carrots!</div>
 
         <!-- Particle Container -->
         <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
@@ -644,14 +644,14 @@
                 const reward = Math.max(100, this.calculateCPS() * 300);
                 this.addCarrots(reward);
                 
-                this.spawnMessage("Found Kylie Bunny! :P +" + this.formatNumber(reward));
+                this.spawnMessage("You caught the Kylie Bunny! :P +" + this.formatNumber(reward));
                 if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
             },
 
             triggerStorm() {
                 this.modifiers.eventMult = 3;
                 document.getElementById('storm-overlay').style.display = 'block';
-                this.showBanner("BIRTHDAY SURPRISE! (x3)");
+                this.showBanner("Birthday Surprise! (x3)");
                 
                 setTimeout(() => {
                     this.modifiers.eventMult = 1;
