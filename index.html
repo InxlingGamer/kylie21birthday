@@ -141,13 +141,13 @@
             
             <h1 class="text-3xl font-black text-orange-500 mb-4 drop-shadow-sm">Happy 21st Birthday, Kylie! 🎉</h1>
             <p class="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
-                I made this little bunny world just for you. Tap carrots, build a bunny empire, and have the best birthday ever!
+                I made this little bunny world just for you. Tap carrots, build a bunny family, and have the best birthday ever!
             </p>
             <p class="text-gray-500 dark:text-gray-400 italic mb-8 text-sm">
-                Love, [Your Name] ❤️
+                Love, Louie ❤️
             </p>
             <button onclick="game.closeIntro()" class="bg-orange-500 hover:bg-orange-600 text-white py-3 px-8 rounded-full font-bold text-xl shadow-lg transform transition hover:scale-105 btn-press">
-                Let's Party! 🐰
+                Let's Go! 🐰
             </button>
         </div>
     </div>
@@ -284,7 +284,7 @@
 
         // Love Achievements System
         const MILESTONES = [
-            { threshold: 100, msg: "Unlocked 100 Carrots! - I love your smile ❤️", seen: false },
+            { threshold: 100, msg: "You got 100 Carrots! - I love your smile ❤️", seen: false },
             { threshold: 500, msg: "500 Carrots! - You make me so happy ☀️", seen: false },
             { threshold: 1000, msg: "1k Carrots! - I love how driven you are 🌟", seen: false },
             { threshold: 5000, msg: "5k Carrots! - You are beautiful inside and out 💖", seen: false },
@@ -644,7 +644,7 @@
                 const reward = Math.max(100, this.calculateCPS() * 300);
                 this.addCarrots(reward);
                 
-                this.spawnMessage("FOUND KYLIE BUNNY! +" + this.formatNumber(reward));
+                this.spawnMessage("Found Kylie Bunny! :P +" + this.formatNumber(reward));
                 if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
             },
 
