@@ -39,8 +39,9 @@
             color: #e0e0e0;
         }
         body.night-mode .panel-bg {
-            background-color: #16213e;
-            border-color: #30475e;
+            /* Dark Sage for Night Mode Panels */
+            background-color: #26352a !important; 
+            border-color: #3b5241 !important;
         }
 
         /* The Giant Carrot */
@@ -49,6 +50,7 @@
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            z-index: 20;
         }
         #giant-carrot:active {
             transform: scale(0.9);
@@ -138,7 +140,7 @@
     <div id="golden-bunny">🐇</div>
 
     <!-- TOP: HUD -->
-    <header class="flex-none p-4 pt-8 pb-2 bg-orange-100 dark:bg-slate-800 border-b border-orange-200 shadow-sm z-20 panel-bg transition-colors duration-500">
+    <header class="flex-none p-4 pt-8 pb-2 bg-[#e9f0ea] dark:bg-[#354a3b] border-b border-[#d1e0d3] dark:border-[#4a6352] shadow-sm z-20 panel-bg transition-colors duration-500">
         <div class="flex justify-between items-center">
             <div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Carrots</div>
@@ -175,10 +177,10 @@
     </main>
 
     <!-- BOTTOM: Controls & Shop -->
-    <div class="flex-none bg-white dark:bg-slate-900 h-[45dvh] rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] flex flex-col z-30 panel-bg transition-colors duration-500">
+    <div class="flex-none bg-[#e9f0ea] dark:bg-[#26352a] h-[45dvh] rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] flex flex-col z-30 panel-bg transition-colors duration-500">
         
         <!-- Tabs Navigation -->
-        <div class="flex border-b border-gray-100 dark:border-gray-700">
+        <div class="flex border-b border-[#d1e0d3] dark:border-[#3b5241]">
             <button onclick="switchTab('bunnies')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 active-tab text-orange-500 border-b-2 border-orange-500 transition-colors" id="tab-btn-bunnies">
                 <i class="fas fa-paw mb-1 block"></i> Bunnies
             </button>
@@ -194,7 +196,7 @@
         </div>
 
         <!-- Tab Contents -->
-        <div class="flex-grow relative overflow-hidden bg-gray-50 dark:bg-slate-800 transition-colors duration-500">
+        <div class="flex-grow relative overflow-hidden bg-[#f6f9f7] dark:bg-[#354a3b] transition-colors duration-500">
             
             <!-- BUNNIES TAB -->
             <div id="tab-bunnies" class="tab-content active p-4 space-y-3">
@@ -227,7 +229,7 @@
                 </div>
                 
                 <div class="text-center text-xs text-gray-400 mt-4">
-                    Bunny Clicker Mobile v1.0
+                    Bunny Clicker Mobile v1.1 - Sage Edition
                 </div>
             </div>
 
@@ -350,9 +352,9 @@
                 CONFIG.upgrades.forEach(upg => {
                     if (this.state.upgrades.includes(upg.id)) return; // Already bought
                     container.innerHTML += `
-                        <div class="bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-gray-600" id="card-${upg.id}">
+                        <div class="bg-white dark:bg-[#354a3b] p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-[#4a6352]" id="card-${upg.id}">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
+                                <div class="w-10 h-10 rounded-full bg-[#e9f0ea] text-[#354a3b] flex items-center justify-center">
                                     <i class="fas ${upg.icon}"></i>
                                 </div>
                                 <div>
@@ -360,7 +362,7 @@
                                     <div class="text-xs text-gray-500 dark:text-gray-400">${upg.desc}</div>
                                 </div>
                             </div>
-                            <button onclick="game.buyUpgrade('${upg.id}')" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm btn-press min-w-[80px]">
+                            <button onclick="game.buyUpgrade('${upg.id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm btn-press min-w-[80px]">
                                 ${this.formatNumber(upg.cost)} 🥕
                             </button>
                         </div>
@@ -373,9 +375,9 @@
 
             createItemCard(item, type) {
                 return `
-                    <div class="bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-gray-600 item-card" data-id="${item.id}">
+                    <div class="bg-white dark:bg-[#354a3b] p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-100 dark:border-[#4a6352] item-card" data-id="${item.id}">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-lg bg-orange-100 dark:bg-slate-600 text-orange-500 flex items-center justify-center text-xl relative">
+                            <div class="w-12 h-12 rounded-lg bg-[#e9f0ea] dark:bg-[#4a6352] text-[#26352a] flex items-center justify-center text-xl relative">
                                 <i class="fas ${item.icon}"></i>
                                 <div class="absolute -top-2 -right-2 bg-gray-800 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold count-badge" id="count-${item.id}">0</div>
                             </div>
@@ -384,7 +386,7 @@
                                 <div class="text-xs text-green-600 font-mono">+${item.production} CPS</div>
                             </div>
                         </div>
-                        <button onclick="game.buyItem('${item.id}', '${type}')" class="bg-orange-500 disabled:bg-gray-300 dark:disabled:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm btn-press min-w-[90px] transition-colors" id="btn-${item.id}">
+                        <button onclick="game.buyItem('${item.id}', '${type}')" class="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-[#4a6352] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm btn-press min-w-[90px] transition-colors" id="btn-${item.id}">
                             ${this.formatNumber(item.cost)}
                         </button>
                     </div>
@@ -690,9 +692,6 @@
                         btn.classList.add('opacity-50');
                     }
                 });
-                
-                // Update Upgrade buttons visibility logic handled in renderUpgrades mostly, 
-                // but we can add grayscale logic here if we wanted strictly realtime updates.
             },
 
             spawnMessage(msg) {
