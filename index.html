@@ -78,10 +78,11 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
         }
 
-        /* Golden Bunny */
+        /* Golden Bunny (Kylie Bunny) */
         #golden-bunny {
             position: absolute;
-            font-size: 3rem;
+            width: 100px; /* Adjusted size for the gif */
+            height: auto;
             z-index: 40;
             display: none;
             transition: left 4s linear; 
@@ -155,8 +156,8 @@
     <!-- Storm Effect -->
     <div id="storm-overlay" class="storm-overlay"></div>
 
-    <!-- Golden Bunny -->
-    <div id="golden-bunny" class="select-none cursor-pointer drop-shadow-lg filter hover:brightness-110">🐇</div>
+    <!-- Golden Bunny (Changed to Image/GIF) -->
+    <img id="golden-bunny" src="bunny.gif" alt="Kylie Bunny" class="select-none cursor-pointer drop-shadow-lg filter hover:brightness-110">
 
     <!-- TOP: HUD -->
     <header class="flex-none p-4 pt-8 pb-2 bg-[#e9f0ea] dark:bg-[#354a3b] border-b border-[#d1e0d3] dark:border-[#4a6352] shadow-sm z-20 panel-bg transition-colors duration-500">
@@ -210,7 +211,7 @@
                 <i class="fas fa-bolt mb-1 block"></i> Upgrades
             </button>
             <button onclick="switchTab('settings')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 transition-colors" id="tab-btn-settings">
-                <i class="fas fa-heart mb-1 block"></i> System
+                <i class="fas fa-heart mb-1 block"></i> Settings
             </button>
         </div>
 
@@ -644,14 +645,14 @@
                 const reward = Math.max(100, this.calculateCPS() * 300);
                 this.addCarrots(reward);
                 
-                this.spawnMessage("You caught the Kylie Bunny! :P +" + this.formatNumber(reward));
+                this.spawnMessage("FOUND KYLIE BUNNY! +" + this.formatNumber(reward));
                 if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
             },
 
             triggerStorm() {
                 this.modifiers.eventMult = 3;
                 document.getElementById('storm-overlay').style.display = 'block';
-                this.showBanner("Birthday Surprise! (x3)");
+                this.showBanner("BIRTHDAY SURPRISE! (x3)");
                 
                 setTimeout(() => {
                     this.modifiers.eventMult = 1;
