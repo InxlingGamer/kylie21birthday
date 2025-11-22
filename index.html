@@ -25,12 +25,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            /* Set default background image and properties */
-            background-image: var(--day-bg);
-            background-size: 500px auto;
-            background-repeat: repeat;
-            background-position: center;
-            background-attachment: fixed;
+            /* REMOVED background properties from body */
+            
             color: #333;
             overflow: hidden; /* Prevent scroll */
             touch-action: manipulation; /* Improve touch response */
@@ -38,16 +34,33 @@
             user-select: none;
             /* Transition on background-image for smooth day/night switch */
             transition: background-image 1s ease, color 1s ease;
+            /* Added height/width constraints to help with mobile viewport */
             height: 100dvh; 
             width: 100vw;
+            background-color: #e9f0ea; /* Fallback color */
         }
 
         /* Night Mode Transition */
         body.night-mode {
-            /* Switch to night background image */
-            background-image: url('image_1.jpg');
+            /* REMOVED background-image from here */
             color: #e0e0e0;
+            background-color: #1a1a2e; /* Fallback color */
         }
+        
+        /* NEW: Class for the farm background */
+        .bg-farm {
+            background-image: var(--day-bg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease;
+        }
+
+        /* Night Mode for farm background */
+        body.night-mode .bg-farm {
+            background-image: url('image_1.jpg');
+        }
+
         body.night-mode .panel-bg {
             /* Dark Sage for Night Mode Panels */
             background-color: #26352a !important; 
@@ -189,7 +202,7 @@
     </header>
 
     <!-- MIDDLE: The Game Area (Tap Zone) -->
-    <main id="click-zone" class="flex-grow flex flex-col items-center justify-center relative overflow-hidden">
+    <main id="click-zone" class="flex-grow flex flex-col items-center justify-center relative overflow-hidden bg-farm">
         
         <!-- Weather/Event Indicator -->
         <!-- CHANGED: z-10 -> z-50 so it appears in front of the carrot -->
@@ -202,7 +215,7 @@
             🥕
         </div>
         
-        <div class="mt-8 text-gray-400 text-sm font-medium animate-pulse">Tap for some yummy carrots!</div>
+        <div class="mt-8 text-gray-400 text-sm font-medium animate-pulse"></div>
 
         <!-- Particle Container -->
         <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
