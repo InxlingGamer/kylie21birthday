@@ -547,7 +547,11 @@
 
                 // Global Multipliers
                 let globalMult = 1 + (this.state.prestigePoints * 0.1); // +10% per prestige point
-                if (this.state.upgrades.includes('u_all1')) globalMult *= 1.1;
+                CONFIG.upgrades.forEach(u => {
+                    if (this.state.upgrades.includes(u.id) && u.type === 'global') {
+                        globalMult *= u.val; // u.val is 1.1, 1.2, 1.5, etc.
+                    }
+                });
                 
                 // Events
                 globalMult *= this.modifiers.eventMult;
