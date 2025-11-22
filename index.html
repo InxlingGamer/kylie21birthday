@@ -291,20 +291,37 @@
                 { id: 'grower', name: 'Grower Bunny', cost: 150, production: 1, icon: 'fa-carrot', desc: 'Knows good veggies.' },
                 { id: 'farmer', name: 'Farmer Bunny', cost: 500, production: 3, icon: 'fa-hat-cowboy', desc: 'Uses a tiny hoe.' },
                 { id: 'turbo', name: 'Turbo Bunny', cost: 2000, production: 12, icon: 'fa-running', desc: 'Moves incredibly fast.' },
-                { id: 'robot', name: 'Mecha Bunny', cost: 25000, production: 80, icon: 'fa-robot', desc: 'Efficient harvesting.' }
+                { id: 'chef', name: 'Chef Bunny', cost: 8000, production: 40, icon: 'fa-utensils', desc: 'Turns carrots into gourmet meals.' },
+                { id: 'robot', name: 'Mecha Bunny', cost: 25000, production: 80, icon: 'fa-robot', desc: 'Efficient harvesting.' },
+                { id: 'wizard', name: 'Wizard Bunny', cost: 60000, production: 220, icon: 'fa-hat-wizard', desc: 'Conjures carrots from thin air.' },
+                { id: 'ghost', name: 'Ghost Bunny', cost: 300000, production: 1300, icon: 'fa-ghost', desc: 'Harvests silently from beyond.' },
+                { id: 'ninja', name: 'Ninja Bunny', cost: 1500000, production: 7000, icon: 'fa-user-ninja', desc: 'Strikes carrots before they sprout.' },
+                { id: 'king', name: 'King Bunny', cost: 10000000, production: 45000, icon: 'fa-crown', desc: 'Rules the carrot kingdom.' }
             ],
             burrows: [
                 { id: 'hole', name: 'Small Burrow', cost: 1000, production: 5, icon: 'fa-campground', desc: 'Cozy underground home.' },
                 { id: 'tunnel', name: 'Deep Tunnel', cost: 7500, production: 25, icon: 'fa-dungeon', desc: 'Miles of storage.' },
                 { id: 'farm', name: 'Carrot Farm', cost: 40000, production: 140, icon: 'fa-warehouse', desc: 'Industrial scale.' },
-                { id: 'greenhouse', name: 'Greenhouse', cost: 200000, production: 750, icon: 'fa-leaf', desc: 'Year-round growth.' }
+                { id: 'greenhouse', name: 'Greenhouse', cost: 200000, production: 750, icon: 'fa-leaf', desc: 'Year-round growth.' },
+                { id: 'colony', name: 'Bunny Colony', cost: 900000, production: 3800, icon: 'fa-fort-awesome', desc: 'A bustling underground metropolis.' },
+                { id: 'lab', name: 'Carrot Lab', cost: 5000000, production: 20000, icon: 'fa-flask', desc: 'Science makes the carrots grow faster.' },
+                { id: 'factory', name: 'Automated Factory', cost: 25000000, production: 110000, icon: 'fa-cogs', desc: 'Robotic systems maximize efficiency.' },
+                { id: 'arcology', name: 'Bunny Utopia', cost: 150000000, production: 600000, icon: 'fa-city', desc: 'A self-sustaining super-structure.' }
+
             ],
             upgrades: [
-                { id: 'u_tap1', name: 'Sharper Incisors', cost: 250, type: 'tap', val: 1, icon: 'fa-teeth', desc: '+1 Carrot per tap' },
+                { id: 'u_tap1', name: 'Sharper Teeth', cost: 250, type: 'tap', val: 1, icon: 'fa-teeth', desc: '+1 Carrot per tap' },
                 { id: 'u_tap2', name: 'Energized Paws', cost: 1000, type: 'tap', val: 3, icon: 'fa-hand-sparkles', desc: '+3 Carrots per tap' },
+                { id: 'u_tap3', name: 'Carrot Gloves', cost: 5000, type: 'tap', val: 5, icon: 'fa-mitten', desc: '+5 Carrots per tap' },
                 { id: 'u_all1', name: 'Bunny Union', cost: 5000, type: 'global', val: 1.1, icon: 'fa-users', desc: 'Production +10%' },
                 { id: 'u_click_crit', name: 'Mega Crunch', cost: 15000, type: 'crit', val: 0.05, icon: 'fa-star', desc: '5% Chance for x10 Tap' },
-                { id: 'u_turbo', name: 'Headbands', cost: 50000, type: 'unit', target: 'turbo', val: 1.5, icon: 'fa-ribbon', desc: 'Turbo Bunnies +50%' }
+                { id: 'u_turbo', name: 'Headbands', cost: 50000, type: 'unit', target: 'turbo', val: 1.5, icon: 'fa-ribbon', desc: 'Turbo Bunnies +50%' },
+                { id: 'u_tap4', name: 'Lightning Paws', cost: 60000, type: 'tap', val: 15, icon: 'fa-bolt', desc: '+15 Carrots per tap' },
+                { id: 'u_cps_tap', name: 'Bunny Synergy', cost: 75000, type: 'tap_percent', val: 0.10, icon: 'fa-hands-holding-circle', desc: 'Tap gets 10% of CPS' },
+                { id: 'u_all2', name: 'Bunny Council', cost: 200000, type: 'global', val: 1.2, icon: 'fa-chess-board', desc: 'Production +20%' },
+                { id: 'u_click_crit2', name: 'Hyper Crunch', cost: 250000, type: 'crit', val: 0.05, icon: 'fa-burst', desc: 'Additional 5% Chance for x10 Tap' },
+                { id: 'u_all3', name: 'Carrot Constitution', cost: 20000000, type: 'global', val: 1.5, icon: 'fa-scroll', desc: 'Production +50%' }
+
             ]
         };
 
@@ -473,6 +490,7 @@
                 // Add Tap Upgrades
                 CONFIG.upgrades.forEach(u => {
                     if (this.state.upgrades.includes(u.id) && u.type === 'tap') val += u.val;
+                    if (u.type === 'tap_percent') val += (this.calculateCPS() * u.val);
                 });
 
                 // Apply Event Multiplier
