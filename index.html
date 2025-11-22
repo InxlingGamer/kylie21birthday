@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Kylie's Bunny Clicker</title>
+    <title>Kylie's Bunny Clicker 🥕</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -648,10 +648,10 @@
                 bunny.style.display = 'none';
                 
                 // Reward: 5 minutes of CPS or big flat amount
-                const reward = Math.max(100, this.calculateCPS() * 300);
+                const reward = Math.max(100, this.calculateCPS() * 100);
                 this.addCarrots(reward);
                 
-                this.spawnMessage("FOUND KYLIE BUNNY! +" + this.formatNumber(reward));
+                this.spawnMessage("Found Kylie Bunny! 🐰 +" + this.formatNumber(reward));
                 if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
             },
 
@@ -671,7 +671,7 @@
                 this.settings.nightMode = !this.settings.nightMode;
                 if (this.settings.nightMode) {
                     document.body.classList.add('night-mode');
-                    this.spawnMessage("Night falls... (Moon Carrots Active)");
+                    this.spawnMessage("Night falls... bunnies get the zoomies at night (x3)");
                 } else {
                     document.body.classList.remove('night-mode');
                 }
