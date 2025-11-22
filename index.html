@@ -19,23 +19,30 @@
             --primary-orange: #ff8c42;
             --primary-green: #8bc34a;
             --night-bg: #1a1a2e;
-            --day-bg: #fdfbf7;
+            /* Replaced solid color with day background image */
+            --day-bg: url('image_0.png');
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--day-bg);
+            /* Set default background image and properties */
+            background-image: var(--day-bg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: #333;
             overflow: hidden; /* Prevent scroll */
             touch-action: manipulation; /* Improve touch response */
             -webkit-user-select: none; /* Prevent text selection */
             user-select: none;
-            transition: background-color 1s ease;
+            /* Transition on background-image for smooth day/night switch */
+            transition: background-image 1s ease, color 1s ease;
         }
 
         /* Night Mode Transition */
         body.night-mode {
-            background-color: var(--night-bg);
+            /* Switch to night background image */
+            background-image: url('image_1.png');
             color: #e0e0e0;
         }
         body.night-mode .panel-bg {
@@ -78,10 +85,10 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
         }
 
-        /* Golden Bunny (Kylie Bunny) */
+        /* Golden Bunny (Kylie Bunny) - Using GIF */
         #golden-bunny {
             position: absolute;
-            width: 100px; /* Adjusted size for the gif */
+            width: 100px; /* Adjusted size for the gif (500px is too big for mobile) */
             height: auto;
             z-index: 40;
             display: none;
@@ -157,6 +164,7 @@
     <div id="storm-overlay" class="storm-overlay"></div>
 
     <!-- Golden Bunny (Changed to Image/GIF) -->
+    <!-- Ensure bunny.gif is in the same folder as this file -->
     <img id="golden-bunny" src="bunny.gif" alt="Kylie Bunny" class="select-none cursor-pointer drop-shadow-lg filter hover:brightness-110">
 
     <!-- TOP: HUD -->
@@ -181,6 +189,7 @@
     <main id="click-zone" class="flex-grow flex flex-col items-center justify-center relative overflow-hidden">
         
         <!-- Weather/Event Indicator -->
+        <!-- CHANGED: z-10 -> z-50 so it appears in front of the carrot -->
         <div id="event-banner" class="absolute top-4 bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg transform -translate-y-24 transition-transform duration-300 z-50 text-center max-w-[90%]">
             EVENT ACTIVE!
         </div>
@@ -211,7 +220,7 @@
                 <i class="fas fa-bolt mb-1 block"></i> Upgrades
             </button>
             <button onclick="switchTab('settings')" class="flex-1 py-4 text-center font-bold text-gray-400 hover:text-orange-500 transition-colors" id="tab-btn-settings">
-                <i class="fas fa-heart mb-1 block"></i> Settings
+                <i class="fas fa-heart mb-1 block"></i> Options
             </button>
         </div>
 
