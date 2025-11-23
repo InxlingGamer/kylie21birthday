@@ -526,7 +526,7 @@
                     this.spawnParticle(x, y, "❤️", true);
                     if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
                 } else {
-                    this.spawnParticle(x, y, `+${this.formatNumber(val)}`, isCrit);
+                    this.spawnParticle(x, y, `+${this.formatTapValue(val)}`, isCrit);
                 }
 
                 this.animateCarrot();
@@ -853,6 +853,12 @@
 
             formatWithCommas(num) {
                 return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            },
+
+            formatTapValue(num) {
+                if (num < 1) return num.toFixed(2);  // small values need decimals
+                if (num < 1000) return parseFloat(num.toFixed(2)).toString();
+                return this.formatNumber(num); // use your existing k/M/B formatter
             },
 
             save() {
