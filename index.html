@@ -490,11 +490,19 @@
                 
                 // Add Tap Upgrades
                 CONFIG.upgrades.forEach(u => {
-                    if (this.state.upgrades.includes(u.id) && u.type === 'tap') val += u.val;
-                    if (u.type === 'tap_percent') val += (this.calculateCPS() * u.val);
+                    if (!this.state.upgrades.includes(u.id)) return; // only apply purchased upgrades
+
+                    if (u.type === 'tap') {
+                        // flat tap bonuses (+1, +3, +5, +15)
+                        val += u.val;
+                    } else if (u.type === 'tap_percent') {
+                        // base CPS (remove cpsMult so storm doesn't double-dip)
+                        const baseCps = this.calculateCPS() / this.modifiers.cpsMult;
+                        val += baseCps * u.val; // e.g., 0.10 for 10%
+                    }
                 });
 
-                // Apply Event Multiplier
+                // Apply event multiplier to taps
                 val *= this.modifiers.tapMult;
 
                 // Crit check
@@ -708,11 +716,11 @@
                 this.modifiers.tapMult = 3;
                 this.updateHeader();
                 document.getElementById('storm-overlay').style.display = 'block';
-                this.showBanner("BIRTHDAY SURPRISE! (x3)");
+                this.showBanner("BIRTHDAY SURPRISE! (x3 EVERYTHING)");
                 
                 setTimeout(() => {
                     this.modifiers.cpsMult = 1;
-                    this.modifiers.tapMult = 1;
+                    this.modifiers.tapMult = this.settings.nightMode ? 3 : 1;
                     this.updateHeader();
                     document.getElementById('storm-overlay').style.display = 'none';
                     this.hideBanner();
@@ -723,7 +731,7 @@
                 this.settings.nightMode = !this.settings.nightMode;
                 if (this.settings.nightMode) {
                     document.body.classList.add('night-mode');
-                    this.spawnMessage("Night falls... bunnies get the zoomies at night (x3)");
+                    this.spawnMessage("Night falls... bunnies get the zoomies at night (x3 taps)");
                     this.modifiers.tapMult = 3;
                 } else {
                     document.body.classList.remove('night-mode');
