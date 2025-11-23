@@ -485,9 +485,9 @@
 
             // Core Mechanics
             handleTap(x, y) {
-                // Calculate value
-                let val = (1 + (this.state.prestigePoints * 0.1)); // Base + Prestige
-                
+                // Base tap value (before upgrades, events, etc.)
+                let val = 1;
+
                 // Add Tap Upgrades
                 CONFIG.upgrades.forEach(u => {
                     if (!this.state.upgrades.includes(u.id)) return; // only apply purchased upgrades
@@ -502,7 +502,11 @@
                     }
                 });
 
-                // Apply event multiplier to taps
+                // Apply BSP as global tap multiplier: +1% per BSP
+                const prestigeMult = 1 + this.state.prestigePoints * 0.01;
+                val *= prestigeMult;
+
+                // Apply event multiplier to taps (storm/night buffs)
                 val *= this.modifiers.tapMult;
 
                 // Crit check
@@ -555,7 +559,7 @@
                 });
 
                 // Global Multipliers
-                let globalMult = 1 + (this.state.prestigePoints * 0.1); // +10% per prestige point
+                let globalMult = 1 + (this.state.prestigePoints * 0.01); // +1% per prestige point
                 CONFIG.upgrades.forEach(u => {
                     if (this.state.upgrades.includes(u.id) && u.type === 'global') {
                         globalMult *= u.val; // u.val is 1.1, 1.2, 1.5, etc.
@@ -784,7 +788,7 @@
 
                 if (this.state.prestigePoints > 0) {
                     document.getElementById('prestige-status').classList.remove('hidden');
-                    document.getElementById('spirit-bonus').innerText = (this.state.prestigePoints * 10) + "%";
+                    document.getElementById('spirit-bonus').innerText = (this.state.prestigePoints * 1) + "%";
                 }
             },
 
