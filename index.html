@@ -360,7 +360,8 @@
                 globalProdMult: 1,
                 tapValue: 1,
                 critChance: 0,
-                eventMult: 1
+                tapMult: 1,
+                cpsMult: 1
             },
 
             settings: {
@@ -494,7 +495,7 @@
                 });
 
                 // Apply Event Multiplier
-                val *= this.modifiers.eventMult;
+                val *= this.modifiers.tapMult;
 
                 // Crit check
                 let isCrit = false;
@@ -554,7 +555,7 @@
                 });
                 
                 // Events
-                globalMult *= this.modifiers.eventMult;
+                globalMult *= this.modifiers.cpsMult;
 
                 return cps * globalMult;
             },
@@ -703,12 +704,16 @@
             },
 
             triggerStorm() {
-                this.modifiers.eventMult = 3;
+                this.modifiers.cpsMult = 3;
+                this.modifiers.tapMult = 3;
+                this.updateHeader();
                 document.getElementById('storm-overlay').style.display = 'block';
                 this.showBanner("BIRTHDAY SURPRISE! (x3)");
                 
                 setTimeout(() => {
-                    this.modifiers.eventMult = 1;
+                    this.modifiers.cpsMult = 1;
+                    this.modifiers.tapMult = 1;
+                    this.updateHeader();
                     document.getElementById('storm-overlay').style.display = 'none';
                     this.hideBanner();
                 }, 15000); // 15 seconds
@@ -719,9 +724,13 @@
                 if (this.settings.nightMode) {
                     document.body.classList.add('night-mode');
                     this.spawnMessage("Night falls... bunnies get the zoomies at night (x3)");
+                    this.modifiers.tapMult = 3;
                 } else {
                     document.body.classList.remove('night-mode');
+                    this.modifiers.tapMult = 1;
                 }
+
+                this.updateHeader();
             },
 
             // Prestige System
